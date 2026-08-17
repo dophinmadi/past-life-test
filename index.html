@@ -284,6 +284,59 @@
   .result-actions .row { display: flex; gap: 12px; }
   .result-actions .row .btn { flex: 1; }
 
+  /* ============ 选择回顾 ============ */
+  .review { text-align: left; margin-bottom: 22px; }
+  .review .rv-kicker {
+    text-align: center; font-size: 12px; letter-spacing: 5px;
+    color: var(--gold-deep); margin-bottom: 6px;
+  }
+  .review .rv-title {
+    text-align: center; font-size: 17px; font-weight: 700;
+    letter-spacing: 2px; color: var(--ink); margin-bottom: 4px;
+  }
+  .review .rv-tip {
+    text-align: center; font-size: 12px; color: #9a8a74;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .review-item {
+    background: #fffdf6;
+    border: 1px solid rgba(169,130,63,.22);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(74,54,30,.05);
+  }
+  .review-item .ri-q {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; cursor: pointer;
+    transition: background .2s ease;
+  }
+  .review-item .ri-q:active { background: #f7efdd; }
+  .review-item .ri-no {
+    flex: none; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--gold); color: #fff; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .review-item .ri-title {
+    flex: 1; font-size: 14px; line-height: 1.4; color: var(--ink); letter-spacing: .5px;
+  }
+  .review-item .ri-arrow {
+    flex: none; color: var(--gold-deep); font-size: 14px;
+    transition: transform .2s ease;
+  }
+  .review-item.open .ri-arrow { transform: rotate(90deg); }
+  .review-item .ri-body { display: none; padding: 2px 14px 14px 48px; }
+  .review-item.open .ri-body { display: block; }
+  .review-item .ri-opt {
+    font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; letter-spacing: .5px;
+  }
+  .review-item .ri-opt b { color: var(--seal); font-weight: 700; }
+  .review-item .ri-say {
+    font-size: 13.5px; line-height: 1.75; color: #5a4a3a; letter-spacing: .5px;
+    background: #f7efdd; border-radius: 8px; padding: 10px 12px;
+    border-left: 3px solid var(--gold);
+  }
+
   .toast {
     position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px);
     background: rgba(43,33,24,.92); color: #f7efdd;
@@ -336,6 +389,12 @@
         <div class="r-name" id="r-name"></div>
         <div class="r-past">前世名 · <b id="r-past"></b></div>
         <div class="poster" id="poster"></div>
+        <div class="review">
+          <div class="rv-kicker">— 你的选择回顾 —</div>
+          <div class="rv-title">这一路，你是这样选的</div>
+          <div class="rv-tip">点开每一条，看看你的选择与解读</div>
+          <div class="review-list" id="review-list"></div>
+        </div>
         <div class="result-actions">
           <button class="btn" id="btn-save">保存 / 分享海报</button>
           <div class="row">
@@ -356,73 +415,73 @@ var QUESTIONS = [
   {
     q: "社交场上的你，更像哪种人？",
     opts: [
-      { t: "话不多，但一眼看穿局面", id: "贵妃" },
-      { t: "一开口，就有人想听下去", id: "说书人" },
-      { t: "默默张罗，把每个人照顾好", id: "女医官" },
-      { t: "想走就走，不硬撑到散场", id: "女侠" }
+      { t: "话不多，但一眼看穿局面", id: "贵妃", say: "你心里明镜似的，只是懒得点破——这份通透，是前世在深宫里练出来的。" },
+      { t: "一开口，就有人想听下去", id: "说书人", say: "你一开口就有人侧耳，这本事从说书台上一脉相承。" },
+      { t: "默默张罗，把每个人照顾好", id: "女医官", say: "把每个人都放在心上，是你前世悬壶济世时留下的温柔。" },
+      { t: "想走就走，不硬撑到散场", id: "女侠", say: "不勉强、不硬撑，前世你也是这么说走就走的性子。" }
     ]
   },
   {
     q: "你更向往哪一种“厉害”？",
     opts: [
-      { t: "靠实力，让人心服口服", id: "女官" },
-      { t: "把一件事，做到无人能及", id: "画匠" },
-      { t: "白手起家，越做越大", id: "商贾" },
-      { t: "越难越上，从不认输", id: "女将军" }
+      { t: "靠实力，让人心服口服", id: "女官", say: "你信真本事，不信巧言——朝堂之上，唯有实力才立得住。" },
+      { t: "把一件事，做到无人能及", id: "画匠", say: "你愿为一件事穷尽一生，这是匠人眼里“技近乎道”的执着。" },
+      { t: "白手起家，越做越大", id: "商贾", say: "从无到有最见本事，你骨子里有东家的盘算与魄力。" },
+      { t: "越难越上，从不认输", id: "女将军", say: "越难越兴奋，这份不服输，是沙场磨出来的血性。" }
     ]
   },
   {
     q: "心情低落时，你更想怎么排解？",
     opts: [
-      { t: "一个人出去透透气", id: "女侠" },
-      { t: "找个人痛快聊一场", id: "说书人" },
-      { t: "沉下心做点具体的事", id: "画匠" },
-      { t: "先稳住自己，理清头绪", id: "女官" }
+      { t: "一个人出去透透气", id: "女侠", say: "独行是你的解药，前世你也是这样一骑绝尘散心去。" },
+      { t: "找个人痛快聊一场", id: "说书人", say: "说破无毒，你一聊就通，天生的表达让情绪有了出口。" },
+      { t: "沉下心做点具体的事", id: "画匠", say: "手上忙着，心就静了——这是匠人安抚自己的方式。" },
+      { t: "先稳住自己，理清头绪", id: "女官", say: "越乱越要清醒，这份自持，是庙堂之上练出的定力。" }
     ]
   },
   {
     q: "你最舍不得丢掉的是？",
     opts: [
-      { t: "一身骨气，不向谁低头", id: "女将军" },
-      { t: "一份温柔，给世界留有余地", id: "女医官" },
-      { t: "一份清醒，不被情绪带偏", id: "贵妃" },
-      { t: "一份精明，不吃糊涂亏", id: "商贾" }
+      { t: "一身骨气，不向谁低头", id: "女将军", say: "骨气是你的命，前世你为它上过战场，这辈子也不肯折。" },
+      { t: "一份温柔，给世界留有余地", id: "女医官", say: "你舍不得对人冷，这份温柔是你悬壶时留给世间的暖。" },
+      { t: "一份清醒，不被情绪带偏", id: "贵妃", say: "清醒最难得，你在六宫风浪里守住的，正是这份不迷。" },
+      { t: "一份精明，不吃糊涂亏", id: "商贾", say: "你心里有本账，吃亏可以，糊里糊涂不行。" }
     ]
   },
   {
     q: "朋友遇到麻烦，你通常会？",
     opts: [
-      { t: "直接上手，帮他把事摆平", id: "女官" },
-      { t: "陪他聊聊，先把情绪理顺", id: "说书人" },
-      { t: "帮他盘算利弊，想条出路", id: "商贾" },
-      { t: "第一个到场，替他兜底", id: "女将军" }
+      { t: "直接上手，帮他把事摆平", id: "女官", say: "你最见不得乱，出手便是替人做主，是当官的行事。" },
+      { t: "陪他聊聊，先把情绪理顺", id: "说书人", say: "先顺气再办事，你懂人心，一句话能安定半场人。" },
+      { t: "帮他盘算利弊，想条出路", id: "商贾", say: "你习惯先算清楚再动手，这是生意人刻进骨子里的稳妥。" },
+      { t: "第一个到场，替他兜底", id: "女将军", say: "危难时你第一个到，这份义气，是将军对袍泽的担当。" }
     ]
   },
   {
     q: "你更愿意把时间花在？",
     opts: [
-      { t: "磨一门越磨越精的手艺", id: "画匠" },
-      { t: "看更大的世界，多走多看", id: "女侠" },
-      { t: "学一身走到哪都不慌的本事", id: "女医官" },
-      { t: "攒一份实打实的底气", id: "商贾" }
+      { t: "磨一门越磨越精的手艺", id: "画匠", say: "你把时间投给一门手艺，沉得住气，是匠人的心性。" },
+      { t: "看更大的世界，多走多看", id: "女侠", say: "天地广阔才是你的归处，前世你已看遍山河。" },
+      { t: "学一身走到哪都不慌的本事", id: "女医官", say: "本事傍身最安心，走到哪儿都能安身立命。" },
+      { t: "攒一份实打实的底气", id: "商贾", say: "底气比什么都实在，你一步步攒出来的，最靠得住。" }
     ]
   },
   {
     q: "你最不想听到别人说你？",
     opts: [
-      { t: "“你就是运气好”", id: "女官" },
-      { t: "“你就是想太多”", id: "贵妃" },
-      { t: "“你就是不肯服软”", id: "女将军" },
-      { t: "“你就是太特立独行”", id: "女侠" }
+      { t: "“你就是运气好”", id: "女官", say: "你最烦被说成凭运气，因为你知道自己每一步都是实力。" },
+      { t: "“你就是想太多”", id: "贵妃", say: "想得多不是坏事，你看得透，才想得深。" },
+      { t: "“你就是不肯服软”", id: "女将军", say: "服软二字与你无缘，硬气是你的底色。" },
+      { t: "“你就是太特立独行”", id: "女侠", say: "特立独行恰是你的活法，不必向谁解释。" }
     ]
   },
   {
     q: "你理想的人生，更像哪种节奏？",
     opts: [
-      { t: "一幅慢慢上色的画", id: "画匠" },
-      { t: "一本讲不完的故事", id: "说书人" },
-      { t: "一壶越熬越温的药", id: "女医官" },
-      { t: "一盘越下越活的棋", id: "贵妃" }
+      { t: "一幅慢慢上色的画", id: "画匠", say: "你的人生是一幅长卷，慢慢来，反而处处是惊色。" },
+      { t: "一本讲不完的故事", id: "说书人", say: "你的故事写不完，越讲越有味道。" },
+      { t: "一壶越熬越温的药", id: "女医官", say: "你相信时间的力量，越熬越有温润的回甘。" },
+      { t: "一盘越下越活的棋", id: "贵妃", say: "你把日子过成一盘棋，走一步看三步，越下越活。" }
     ]
   }
 ];
@@ -453,7 +512,7 @@ var CAT = {
 
 /* ============ 状态 ============ */
 var cur = 0;
-var scores = {};
+var answers = [];
 
 var $ = function(id){ return document.getElementById(id); };
 var screens = {
@@ -492,15 +551,15 @@ function renderQuestion(){
     var div = document.createElement("div");
     div.className = "opt";
     div.innerHTML = '<span class="tag">' + LBL[i] + '</span><span class="txt">' + o.t + '</span>';
-    div.addEventListener("click", function(){ pick(div, o.id); });
+    div.addEventListener("click", function(){ pick(div, o); });
     box.appendChild(div);
   });
 }
 
-function pick(el, id){
+function pick(el, o){
   if (el.classList.contains("pick")) return;
   el.classList.add("pick");
-  scores[id] = (scores[id] || 0) + 1;
+  answers[cur] = { q: QUESTIONS[cur].q, opt: o };
   setTimeout(function(){
     if (cur < QUESTIONS.length - 1){
       cur++;
@@ -515,9 +574,11 @@ function pick(el, id){
 function computeResultInner(){
   // 1/20 彩蛋
   if (Math.random() < 0.05) return CAT;
+  var tally = {};
+  answers.forEach(function(a){ if (a) tally[a.opt.id] = (tally[a.opt.id] || 0) + 1; });
   var best = null, bestScore = -1, ties = [];
   IDS.forEach(function(id){
-    var s = scores[id] || 0;
+    var s = tally[id] || 0;
     if (s > bestScore){ bestScore = s; best = id; ties = [id]; }
     else if (s === bestScore){ ties.push(id); }
   });
@@ -532,6 +593,7 @@ function finish(){
   $("r-past").textContent = r.past;
   $("r-kicker").textContent = (r === CAT) ? "恭喜触发彩蛋" : "你的前世身份";
   renderPosterHTML(r);
+  renderReview();
   show("result");
 }
 
@@ -549,6 +611,31 @@ function renderPosterHTML(r){
     '<div class="p-text">' + r.text + '</div>' +
     '<div class="p-seal"><span>前</span><span>世</span></div>' +
     '<div class="p-foot">前世今生 · 命中注定</div>';
+}
+
+/* ============ 选择回顾 ============ */
+function renderReview(){
+  var box = $("review-list");
+  box.innerHTML = "";
+  answers.forEach(function(a, i){
+    if (!a) return;
+    var item = document.createElement("div");
+    item.className = "review-item";
+    item.innerHTML =
+      '<div class="ri-q">' +
+        '<span class="ri-no">' + (i + 1) + '</span>' +
+        '<span class="ri-title">' + a.q + '</span>' +
+        '<span class="ri-arrow">▸</span>' +
+      '</div>' +
+      '<div class="ri-body">' +
+        '<div class="ri-opt">你选了：<b>' + a.opt.t + '</b></div>' +
+        '<div class="ri-say">' + a.opt.say + '</div>' +
+      '</div>';
+    item.querySelector(".ri-q").addEventListener("click", function(){
+      item.classList.toggle("open");
+    });
+    box.appendChild(item);
+  });
 }
 
 /* ============ 海报生成（Canvas，无外部依赖） ============ */
@@ -739,7 +826,7 @@ function downloadBlob(blob, name){
 
 /* ============ 事件绑定 ============ */
 $("btn-start").addEventListener("click", function(){
-  cur = 0; scores = {};
+  cur = 0; answers = [];
   renderQuestion();
   show("quiz");
 });
@@ -748,15 +835,13 @@ $("btn-back").addEventListener("click", function(){
   if (cur === 0){
     show("start");
   } else {
-    // 回退需撤销上一题的分数
-    var prev = QUESTIONS[cur-1].opts;
     cur--;
     renderQuestion();
   }
 });
 
 $("btn-retest").addEventListener("click", function(){
-  cur = 0; scores = {}; currentResult = null;
+  cur = 0; answers = []; currentResult = null;
   renderQuestion();
   show("quiz");
 });
