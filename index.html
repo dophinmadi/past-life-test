@@ -321,6 +321,36 @@
     font-size: 14px; line-height: 1.85; color: #5a4a3a; letter-spacing: .5px;
   }
   .review .rv-synth-text b { color: var(--seal); font-weight: 700; }
+
+  /* 前世详说 */
+  .r-detail { text-align: left; margin-bottom: 20px; }
+  .r-detail .r-detail-kicker {
+    text-align: center; font-size: 12px; letter-spacing: 5px;
+    color: var(--gold-deep); margin-bottom: 8px;
+  }
+  .r-detail .r-detail-text {
+    font-size: 14.5px; line-height: 2; color: #5a4a3a; letter-spacing: .5px;
+    background: #fdf6e8; border: 1px solid rgba(169,130,63,.22);
+    border-radius: 12px; padding: 14px 16px; text-align: justify;
+  }
+
+  /* 其他身份 */
+  .others { text-align: left; margin-bottom: 20px; }
+  .others .ot-kicker {
+    text-align: center; font-size: 12px; letter-spacing: 5px;
+    color: var(--gold-deep); margin-bottom: 12px;
+  }
+  .others .ot-item {
+    background: #fffdf6; border: 1px solid rgba(169,130,63,.18);
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+  }
+  .others .ot-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .others .ot-name { font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: 1px; }
+  .others .ot-past { font-size: 12px; color: var(--gold-deep); letter-spacing: 1px; }
+  .others .ot-text { font-size: 13px; line-height: 1.8; color: #6a5a48; letter-spacing: .5px; }
   .review-item {
     background: #fffdf6;
     border: 1px solid rgba(169,130,63,.22);
@@ -412,13 +442,23 @@
         <div class="r-name" id="r-name"></div>
         <div class="r-past">前世名 · <b id="r-past"></b></div>
         <div class="poster" id="poster"></div>
+
+        <div class="r-detail">
+          <div class="r-detail-kicker">— 前世详说 —</div>
+          <div class="r-detail-text" id="r-detail"></div>
+        </div>
+
         <div class="review">
           <div class="rv-kicker">— 你的选择回顾 —</div>
-          <div class="rv-title">你的选择，合成了同一个人</div>
-          <div class="rv-tip">同类项越集中，越是你前世的样子</div>
           <div class="rv-synth" id="rv-synth"></div>
           <div class="review-list" id="review-list"></div>
         </div>
+
+        <div class="others">
+          <div class="ot-kicker">— 其他的前世身份 —</div>
+          <div class="ot-list" id="ot-list"></div>
+        </div>
+
         <div class="result-actions">
           <button class="btn" id="btn-save">保存 / 分享海报</button>
           <div class="row">
@@ -512,24 +552,31 @@ var QUESTIONS = [
 
 var RESULTS = {
   "女侠":   { name:"江湖女侠", past:"凛霜", c1:"#3d4a63", c2:"#6d8fb0", theme:"说走就走的洒脱",
-              text:"一人一剑走天涯，行侠仗义不看谁的脸色。这辈子你自带“说走就走”的底气，最受不得拘束。" },
+              text:"一人一剑走天涯，行侠仗义不看谁的脸色。这辈子你自带“说走就走”的底气，最受不得拘束。",
+              detail:"这一世，你最该信的是自己的直觉——想去就去，该走就走，别让人生被“应该”两个字困住。你的路不在规矩里，而在没人走过的地方。有人一生都在找岸，你生来就是风。" },
   "军师":   { name:"皇权军师", past:"玄策", c1:"#1a1f2a", c2:"#4a5668", theme:"运筹帷幄的谋略",
-              text:"不执刀剑，却靠脑子在皇权里翻云覆雨，算无遗策，谁都要忌惮她三分。这辈子你天生有看透棋局、运筹帷幄的本事。" },
+              text:"不执刀剑，却靠脑子在皇权里翻云覆雨，算无遗策，谁都要忌惮她三分。这辈子你天生有看透棋局、运筹帷幄的本事。",
+              detail:"这一世，你的脑子是你最大的底牌——看得透棋局，也忍得住手。你不必事事冲在前面，让事情按你的盘算发生，才是你的本事。真正安静的人，往往才握着局势。" },
   "贵妃":   { name:"深宫贵妃", past:"婉宁", c1:"#6d1f38", c2:"#c9557a", theme:"看懂人心的清醒",
-              text:"集万千宠爱于一身，却把后宫这盘棋下得明明白白，是局里最清醒的人。这辈子你天生擅长看懂人心、掌控场面。" },
+              text:"集万千宠爱于一身，却把后宫这盘棋下得明明白白，是局里最清醒的人。这辈子你天生擅长看懂人心、掌控场面。",
+              detail:"这一世，你比谁都懂人——懂人心里的软，也懂人心里的狠。你不靠吵闹争输赢，靠的是看透之后依然从容。别人在局里迷路，你早把整盘棋看得分明。" },
   "东家":   { name:"富甲女东家", past:"云锦", c1:"#0e5549", c2:"#3a9d8c", theme:"白手起家的精明",
-              text:"白手起家，把生意做遍天下，谁说女子不能称“东家”。这辈子你天生有“算大局”的脑子。" },
+              text:"白手起家，把生意做遍天下，谁说女子不能称“东家”。这辈子你天生有“算大局”的脑子。",
+              detail:"这一世，你有把“无”变成“有”的手腕。不靠谁施舍，不靠谁垂青，你信的是自己一步步攒下的底气。账面上的数目是小事，那份“我靠自己”的踏实，才是你的根。" },
   "绣女":   { name:"天工绣女", past:"锦心", c1:"#7a5a2b", c2:"#c68a42", theme:"沉下心的专注",
-              text:"一针一线绣尽山河，把心都缝进了锦缎里，绣出的花鸟能引蝶来。这辈子你适合沉下心，把一件事做到极致。" },
+              text:"一针一线绣尽山河，把心都缝进了锦缎里，绣出的花鸟能引蝶来。这辈子你适合沉下心，把一件事做到极致。",
+              detail:"这一世，你适合把一件事做到极致——一针一线，一点一点，时间会还你一件别人抢不走的作品。慢不是落后，是把心都缝进去。当世界都在赶，你的安静本身就是绝活。" },
   "说书人": { name:"说书女先生", past:"月娘", c1:"#3a2a58", c2:"#7a5aa0", theme:"出口成章的才气",
-              text:"一张嘴说尽天下事，靠才华吃饭，谁都得听她讲完这一段。这辈子你天生自带“表达欲”和感染力。" }
+              text:"一张嘴说尽天下事，靠才华吃饭，谁都得听她讲完这一段。这辈子你天生自带“表达欲”和感染力。",
+              detail:"这一世，你的嘴和你的心一样灵——能讲出别人讲不出的故事，也能把平淡的日子说得有声有色。你的才气是藏不住的光，总会在对的场合一鸣惊人。" }
 };
 
 var CAT_RATE = 0.05;  // 彩蛋概率：1/20
 
 var CAT = {
   name:"前世的一只猫", past:"无名之猫", c1:"#54402a", c2:"#c98a3d",
-  text:"你上辈子……根本不是人，是一只猫。走过很多地方，没人能真正养熟你。"
+  text:"你上辈子……根本不是人，是一只猫。走过很多地方，没人能真正养熟你。",
+  detail:"这一世，你依然会是那个特立独行的存在——不轻易靠近，也不轻易被驯服。你自带一种慵懒的清醒，看穿了很多事，只是懒得理会。别为合群委屈自己，你本来就不属于谁。"
 };
 
 /* ============ 状态 ============ */
@@ -618,8 +665,10 @@ function finish(){
   $("r-name").textContent = r.name;
   $("r-past").textContent = r.past;
   $("r-kicker").textContent = (r === CAT) ? "恭喜触发隐藏彩蛋" : "你的前世身份";
+  $("r-detail").textContent = r.detail;
   renderPosterHTML(r);
   renderReview();
+  renderOthers();
   show("result");
 }
 
@@ -646,12 +695,10 @@ function renderReview(){
   var list = $("review-list");
   list.innerHTML = "";
 
-  // 提取同类项：每题取权重最高的人物，看用户的选择扎堆在哪一类
+  // 统计每个选择最贴近的“一路”，看大多数落在哪
   var dist = {};
-  var answered = 0;
   answers.forEach(function(a){
     if (!a) return;
-    answered++;
     var w = a.opt.w || {};
     var best = null, bs = 0;
     for (var k in w){ if (w[k] > bs){ bs = w[k]; best = k; } }
@@ -663,25 +710,22 @@ function renderReview(){
     var pct = Math.round(CAT_RATE * 100);
     var every = Math.round(1 / CAT_RATE);
     synth.innerHTML =
-      '<div class="rv-synth-tag">稀有身份 · 隐藏彩蛋</div>' +
-      '<div class="rv-synth-text">全站仅 <b>' + pct + '%</b> 的概率会测出这个身份（每 ' + every + ' 人里才 1 个）。你，是那万里挑一的猫。</div>';
+      '<div class="rv-synth-text">全站仅 <b>' + pct + '%</b> 的概率会测出这个身份——每 ' + every + ' 人里才出 1 个。你是那万里挑一的猫。</div>';
   } else {
     var order = Object.keys(dist).sort(function(x, y){ return dist[y] - dist[x]; });
-    var top = order[0], topN = dist[top] || 0;
+    var top = order[0];
     var topTheme = RESULTS[top] ? RESULTS[top].theme : "";
     var myTheme = currentResult.theme || "";
     var body;
     if (RESULTS[top] === currentResult){
-      body = '你 ' + answered + ' 次选择里，有 ' + topN + ' 次都落在「' + myTheme + '」这一类——你不是三心二意的人，前世自然也不会是随便一个身份。';
+      body = '你的大多数选择，都顺着「' + myTheme + '」这一路走到底——这样的人，前世自然也不会是随便一个身份。';
     } else {
-      body = '你的选择看似散在「' + topTheme + '」等不同路上，但合起来看，它们都汇成了同一个人——「' + myTheme + '」的你。';
+      body = '你的选择有散有聚，但大多绕着「' + topTheme + '」打转，最后都收束成了「' + myTheme + '」——你的前世，自有它的来路。';
     }
-    synth.innerHTML =
-      '<div class="rv-synth-tag">你的同类项</div>' +
-      '<div class="rv-synth-text">' + body + '</div>';
+    synth.innerHTML = '<div class="rv-synth-text">' + body + '</div>';
   }
 
-  // 逐条列出选择（只列所选，不再逐条解读）
+  // 逐条列出选择
   answers.forEach(function(a, i){
     if (!a) return;
     var item = document.createElement("div");
@@ -699,6 +743,22 @@ function renderReview(){
       item.classList.toggle("open");
     });
     list.appendChild(item);
+  });
+}
+
+function renderOthers(){
+  var box = $("ot-list");
+  if (!box) return;
+  box.innerHTML = "";
+  IDS.forEach(function(id){
+    var r = RESULTS[id];
+    if (currentResult !== CAT && r === currentResult) return;  // 跳过本人
+    var item = document.createElement("div");
+    item.className = "ot-item";
+    item.innerHTML =
+      '<div class="ot-head"><span class="ot-name">' + r.name + '</span><span class="ot-past">前世名 · ' + r.past + '</span></div>' +
+      '<div class="ot-text">' + r.text + '</div>';
+    box.appendChild(item);
   });
 }
 
